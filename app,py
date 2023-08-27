@@ -1,0 +1,33 @@
+from flask import Flask, render_template, request, redirect, url_for
+import pytesseract
+from pdf2image import convert_from_path
+from PIL import Image
+import os
+
+app = Flask(__name__)
+
+@app.route('/', methods=['GET'])
+def index():
+    return render_template('index.html')
+
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    if 'file' not in request.files:
+        return redirect(request.url)
+    file = request.files['file']
+    if file.filename == '':
+        return redirect(request.url)
+    if file:
+        ext = file.filename.split('.')[-1]
+        if ext == 'pdf':
+            images = convert_from_path(file)
+            text = ""
+            for img in images:
+                text += pytesseract.image_to_string(img)
+        else:
+            image = Image.open(file)
+            text = pytesseract.image_to_string(image)
+        return render_template('index.html', text=text)
+
+if __name__ == '__main__':
+    app.run(debug=True)

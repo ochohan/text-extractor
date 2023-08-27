@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Extraction App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <script>
+        function copyToClipboard() {
+            var textarea = document.getElementById("extractedText");
+            textarea.select();
+            document.execCommand("copy");
+            alert("Text copied to clipboard!");
+        }
+
+        function updateUploadText() {
+            var fileInput = document.getElementById('fileInput');
+            var fileText = document.getElementById('fileText');
+            if (fileInput.files.length) {
+                fileText.textContent = fileInput.files[0].name;
+            } else {
+                fileText.textContent = "No file chosen";
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var uploadArea = document.getElementById("uploadArea");
+            var fileInput = document.getElementById('fileInput');
+
+            uploadArea.addEventListener('dragover', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                uploadArea.style.backgroundColor = '#e0e0e0';
+            });
+
+            uploadArea.addEventListener('dragleave', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                uploadArea.style.backgroundColor = '';
+            });
+
+            uploadArea.addEventListener('drop', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                uploadArea.style.backgroundColor = '';  
+
+                var files = e.dataTransfer.files;
+                fileInput.files = files;
+                updateUploadText();
+            });
+        });
+    </script>
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1,
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        input[type="submit"],
+        textarea,
+        button,
+        .custom-file-upload {
+            width: 100%;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"],
+        button,
+        .custom-file-upload {
+            background-color: #3498db;
+            color: #fff;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        input[type="submit"]:hover,
+        button:hover,
+        .custom-file-upload:hover {
+            background-color: #2980b9;
+        }
+
+        .upload-area {
+            width: 100%;
+            height: 150px;
+            border: 2px dashed #3498db;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #fileText {
+            display: block;
+            margin-bottom: 15px;
+            color: #7f8c8d;
+        }
+
+        textarea {
+            resize: none;
+            width: 100%;
+            max-width: 600px;
+            display: block;
+            margin: 10px 0;
+        }
+
+        button {
+            width: auto;
+            padding: 10px 20px;
+            display: block;
+            margin: 10px auto;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Upload an Image or PDF</h1>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click();">
+            Drag & Drop file here or click to select
+            <input type="file" name="file" id="fileInput" required style="display: none;" onchange="updateUploadText()">
+        </div>
+        <span id="fileText">No file chosen</span>
+        <input type="submit" value="Extract Text">
+    </form>
+    {% if text %}
+    <h2>Extracted Text:</h2>
+    <textarea id="extractedText" rows="10">{{ text }}</textarea>
+    <button onclick="copyToClipboard()">Copy to Clipboard</button>
+    {% endif %}
+</body>
+
+</html>
